@@ -50,28 +50,69 @@ const Chat = () => {
     setInputMessage("");
     setIsTyping(true);
 
-    // Simulate AI response
-    setTimeout(() => {
-      const botResponses = [
-        "That's a great question about farming! Here are some key points to consider...",
-        "For sustainable farming practices, I recommend looking into crop rotation and soil health management.",
-        "Weather patterns can significantly impact your harvest. Let me help you understand the best practices for your crops.",
-        "Precision agriculture tools can really improve your yield efficiency. Would you like specific recommendations?",
-        "Soil testing is crucial for optimal crop growth. I can guide you through the testing process and interpretation.",
-      ];
+    try {
+      const hfApiKey = localStorage.getItem('hf_api_key');
+      let botResponse = "";
 
-      const randomResponse = botResponses[Math.floor(Math.random() * botResponses.length)];
-      
+      if (hfApiKey) {
+        // Use Hugging Face API for better responses
+        const response = await fetch('https://api-inference.huggingface.co/models/microsoft/DialoGPT-medium', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${hfApiKey}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            inputs: `As a knowledgeable farming assistant, respond to this question about agriculture: ${inputMessage}`,
+            parameters: {
+              max_new_tokens: 150,
+              temperature: 0.7,
+              return_full_text: false
+            }
+          }),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          botResponse = data[0]?.generated_text || "I'm here to help with your farming questions. Could you provide more details?";
+        } else {
+          throw new Error('API request failed');
+        }
+      } else {
+        // Fallback to mock responses when no API key
+        const botResponses = [
+          "That's a great question about farming! Here are some key points to consider... (Connect your Hugging Face API key in Profile for more detailed responses)",
+          "For sustainable farming practices, I recommend looking into crop rotation and soil health management. (Upgrade to AI-powered responses in your Profile)",
+          "Weather patterns can significantly impact your harvest. Let me help you understand the best practices for your crops. (Enable AI integration for advanced insights)",
+          "Precision agriculture tools can really improve your yield efficiency. Would you like specific recommendations? (Connect AI for personalized advice)",
+          "Soil testing is crucial for optimal crop growth. I can guide you through the testing process and interpretation. (AI integration available in Profile)",
+        ];
+        botResponse = botResponses[Math.floor(Math.random() * botResponses.length)];
+      }
+
       const botMessage: Message = {
         id: (Date.now() + 1).toString(),
-        content: randomResponse,
+        content: botResponse,
         isBot: true,
         timestamp: new Date(),
       };
 
       setMessages(prev => [...prev, botMessage]);
       setIsTyping(false);
-    }, 1000 + Math.random() * 2000);
+    } catch (error) {
+      console.error('Error getting AI response:', error);
+      
+      // Fallback to mock response on error
+      const botMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        content: "I'm experiencing some technical difficulties. Please try again or check your API key settings in your Profile.",
+        isBot: true,
+        timestamp: new Date(),
+      };
+
+      setMessages(prev => [...prev, botMessage]);
+      setIsTyping(false);
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {

@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Calendar, Wheat, Users, Save } from "lucide-react";
+import { MapPin, Calendar, Wheat, Users, Save, Bot, Key, Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -22,11 +22,27 @@ const Profile = () => {
     bio: "Family farmer specializing in sustainable corn and soybean production. Always looking to learn about new farming techniques and connect with fellow farmers.",
   });
 
+  const [hfApiKey, setHfApiKey] = useState(() => 
+    localStorage.getItem('hf_api_key') || ''
+  );
+  const [showApiKey, setShowApiKey] = useState(false);
+
   const handleSave = () => {
+    // Save API key to localStorage
+    if (hfApiKey) {
+      localStorage.setItem('hf_api_key', hfApiKey);
+    } else {
+      localStorage.removeItem('hf_api_key');
+    }
+    
     toast({
       title: "Profile Updated",
-      description: "Your farming profile has been successfully updated!",
+      description: "Your farming profile and AI settings have been successfully updated!",
     });
+  };
+
+  const handleApiKeyChange = (value: string) => {
+    setHfApiKey(value);
   };
 
   const handleInputChange = (field: keyof typeof profile, value: string) => {
@@ -169,6 +185,73 @@ const Profile = () => {
                   placeholder="Share your farming story, specializations, and what you're passionate about..."
                   className="min-h-[100px]"
                 />
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* AI Integration */}
+          <Card className="shadow-soft">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Bot className="h-5 w-5 text-primary" />
+                AI Integration
+              </CardTitle>
+              <CardDescription>Connect with Hugging Face models for advanced farming assistance</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="hfApiKey" className="flex items-center gap-2">
+                  <Key className="h-4 w-4" />
+                  Hugging Face API Key
+                </Label>
+                <div className="relative">
+                  <Input 
+                    id="hfApiKey"
+                    type={showApiKey ? "text" : "password"}
+                    value={hfApiKey}
+                    onChange={(e) => handleApiKeyChange(e.target.value)}
+                    placeholder="hf_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+                    className="pr-10"
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="absolute right-0 top-0 h-full px-3"
+                    onClick={() => setShowApiKey(!showApiKey)}
+                  >
+                    {showApiKey ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
+                  </Button>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  Get your API key from{" "}
+                  <a 
+                    href="https://huggingface.co/settings/tokens" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-primary hover:underline"
+                  >
+                    Hugging Face Settings
+                  </a>
+                  . This enables advanced AI models for better farming advice.
+                </p>
+              </div>
+              
+              <div className="p-3 bg-muted rounded-lg">
+                <div className="flex items-center gap-2 text-sm font-medium mb-2">
+                  <Bot className="h-4 w-4 text-primary" />
+                  Benefits of AI Integration:
+                </div>
+                <ul className="text-sm text-muted-foreground space-y-1">
+                  <li>• Advanced crop disease identification</li>
+                  <li>• Personalized farming recommendations</li>
+                  <li>• Weather pattern analysis</li>
+                  <li>• Soil health optimization tips</li>
+                </ul>
               </div>
             </CardContent>
           </Card>
