@@ -44,6 +44,10 @@ export default {
 					DEFAULT: 'hsl(var(--accent))',
 					foreground: 'hsl(var(--accent-foreground))'
 				},
+				harvest: {
+					DEFAULT: 'hsl(var(--harvest))',
+					foreground: 'hsl(var(--harvest-foreground))'
+				},
 				popover: {
 					DEFAULT: 'hsl(var(--popover))',
 					foreground: 'hsl(var(--popover-foreground))'
@@ -62,6 +66,11 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				}
+			},
+			backgroundImage: {
+				'gradient-primary': 'var(--gradient-primary)',
+				'gradient-earth': 'var(--gradient-earth)', 
+				'gradient-harvest': 'var(--gradient-harvest)'
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
