@@ -52,11 +52,12 @@ const Chat = () => {
 
     try {
       const hfApiKey = localStorage.getItem('hf_api_key');
+      const hfModel = localStorage.getItem('hf_model') || 'microsoft/DialoGPT-medium';
       let botResponse = "";
 
       if (hfApiKey) {
         // Use Hugging Face API for better responses
-        const response = await fetch('https://api-inference.huggingface.co/models/microsoft/DialoGPT-medium', {
+        const response = await fetch(`https://api-inference.huggingface.co/models/${hfModel}`, {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${hfApiKey}`,

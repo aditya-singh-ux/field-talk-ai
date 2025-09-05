@@ -25,14 +25,21 @@ const Profile = () => {
   const [hfApiKey, setHfApiKey] = useState(() => 
     localStorage.getItem('hf_api_key') || ''
   );
+  const [hfModel, setHfModel] = useState(() => 
+    localStorage.getItem('hf_model') || 'microsoft/DialoGPT-medium'
+  );
   const [showApiKey, setShowApiKey] = useState(false);
 
   const handleSave = () => {
-    // Save API key to localStorage
+    // Save API key and model to localStorage
     if (hfApiKey) {
       localStorage.setItem('hf_api_key', hfApiKey);
     } else {
       localStorage.removeItem('hf_api_key');
+    }
+    
+    if (hfModel) {
+      localStorage.setItem('hf_model', hfModel);
     }
     
     toast({
@@ -43,6 +50,10 @@ const Profile = () => {
 
   const handleApiKeyChange = (value: string) => {
     setHfApiKey(value);
+  };
+
+  const handleModelChange = (value: string) => {
+    setHfModel(value);
   };
 
   const handleInputChange = (field: keyof typeof profile, value: string) => {
@@ -239,6 +250,40 @@ const Profile = () => {
                   </a>
                   . This enables advanced AI models for better farming advice.
                 </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="hfModel">Hugging Face Model</Label>
+                <Input 
+                  id="hfModel"
+                  value={hfModel}
+                  onChange={(e) => handleModelChange(e.target.value)}
+                  placeholder="e.g., microsoft/DialoGPT-medium"
+                />
+                <p className="text-sm text-muted-foreground">
+                  Choose a model for your farming assistant. Popular options:
+                </p>
+                <div className="grid grid-cols-1 gap-2">
+                  {[
+                    { name: "microsoft/DialoGPT-medium", desc: "General conversational AI" },
+                    { name: "facebook/blenderbot-400M-distill", desc: "Conversational AI with knowledge" },
+                    { name: "microsoft/DialoGPT-large", desc: "Advanced conversational AI" },
+                    { name: "google/flan-t5-base", desc: "Instruction-following model" }
+                  ].map((model, index) => (
+                    <Button
+                      key={index}
+                      variant="outline"
+                      size="sm"
+                      className="text-left h-auto p-2 justify-start"
+                      onClick={() => setHfModel(model.name)}
+                    >
+                      <div>
+                        <div className="font-medium text-xs">{model.name}</div>
+                        <div className="text-xs text-muted-foreground">{model.desc}</div>
+                      </div>
+                    </Button>
+                  ))}
+                </div>
               </div>
               
               <div className="p-3 bg-muted rounded-lg">
